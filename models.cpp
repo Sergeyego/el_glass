@@ -59,3 +59,34 @@ void ModelSumpStat::refresh(QDate date)
         setHeaderData(6,Qt::Horizontal,QString::fromUtf8("Дата развар."));
     }
 }
+
+ModelKorrLoad::ModelKorrLoad(QObject *parent) : DbTableModel("glass_korr_load",parent)
+{
+    addColumn("id",QString::fromUtf8("id"));
+    addColumn("dat_load",QString::fromUtf8("Дата"));
+    addColumn("id_korr",QString::fromUtf8("Корректор"),NULL,Rels::instance()->relKorr);
+    addColumn("parti_glass",QString::fromUtf8("Партия"));
+    addColumn("id_matr",QString::fromUtf8("Стекло"),NULL,Rels::instance()->relMatr);
+    setSort("glass_korr_load.dat_load desc, glass_korr_load.id_korr");
+}
+
+void ModelKorrLoad::refresh(QDate begDate, QDate endDate)
+{
+    setFilter("glass_korr_load.dat_load between '"+begDate.toString("yyyy-MM-dd")+"' and '"+endDate.toString("yyyy-MM-dd")+"'");
+    select();
+}
+
+ModelKorrLoadData::ModelKorrLoadData(QObject *parent) : DbTableModel("glass_korr_load_data",parent)
+{
+    addColumn("id_load",QString::fromUtf8("id_load"));
+    addColumn("id_sump_load",QString::fromUtf8("Отстойник"),NULL,Rels::instance()->relSumpLoad);
+    addColumn("proc",QString::fromUtf8("Процент"),new QDoubleValidator(0,100,1,this));
+    setSort("glass_korr_load_data.id_sump_load");
+}
+
+void ModelKorrLoadData::refresh(int id_korr)
+{
+    setFilter("glass_korr_load_data.id_load = "+QString::number(id_korr));
+    setDefaultValue(0,id_korr);
+    select();
+}

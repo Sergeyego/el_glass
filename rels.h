@@ -14,6 +14,7 @@ public:
     DbRelation *relCons;
     DbRelation *relMatr;
     DbRelation *relPar;
+    DbRelation *relSumpLoad;
 
 protected:
     explicit Rels(QObject *parent = 0);

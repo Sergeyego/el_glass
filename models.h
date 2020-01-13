@@ -25,4 +25,18 @@ public:
     void refresh(QDate date);
 };
 
+class ModelKorrLoad : public DbTableModel
+{
+public:
+    ModelKorrLoad(QObject *parent);
+    void refresh(QDate begDate, QDate endDate);
+};
+
+class ModelKorrLoadData : public DbTableModel
+{
+public:
+    ModelKorrLoadData(QObject *parent);
+    void refresh(int id_korr);
+};
+
 #endif // MODELS_H
