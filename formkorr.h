@@ -20,10 +20,17 @@ private:
     Ui::FormKorr *ui;
     ModelKorrLoad *modelKorrLoad;
     ModelKorrLoadData *modelKorrLoadData;
+    ModelKorrLoadPar *modelKorrLoadPar;
+    ModelKorrStat *modelKorrStat;
+    ModelKorrStatData *modelKorrStatData;
+    ModelKorrLoadPar *modelKorrStatPar;
 
 private slots:
     void updLoad();
+    void updStat();
     void updLoadData(QModelIndex ind);
+    void updStatData(QModelIndex ind);
+    void updStatCurrentTime();
 };
 
 #endif // FORMKORR_H

@@ -33,3 +33,9 @@ bool ModelRo::execQuery(QSqlQuery &query)
     }
     return ok;
 }
+
+void ModelRo::select()
+{
+    QSqlQuery q(query());
+    execQuery(q);
+}

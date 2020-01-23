@@ -39,4 +39,28 @@ public:
     void refresh(int id_korr);
 };
 
+class ModelKorrLoadPar : public DbTableModel
+{
+public:
+    ModelKorrLoadPar(QObject *parent);
+    void refresh(int id_korr);
+};
+
+class ModelKorrStat : public ModelRo
+{
+public:
+    ModelKorrStat(QObject *parent);
+    void refresh(QDate date);
+};
+
+class ModelKorrStatData : public ModelRo
+{
+public:
+    ModelKorrStatData(QObject *parent);
+    void refresh(int id_load);
+    QVariant data(const QModelIndex &item, int role) const;
+private:
+    QMultiMap <int,QString> inPar;
+};
+
 #endif // MODELS_H

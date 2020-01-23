@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>860</width>
-    <height>687</height>
+    <width>858</width>
+    <height>685</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,7 +59,17 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <widget class="DbViewer" name="tableViewStat"/>
+        <widget class="DbViewer" name="tableViewStat">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
         <widget class="QWidget" name="layoutWidget">
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
@@ -70,7 +80,11 @@
            </widget>
           </item>
           <item>
-           <widget class="DbViewer" name="tableViewStatGlass"/>
+           <widget class="DbViewer" name="tableViewStatGlass">
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+           </widget>
           </item>
           <item>
            <widget class="QLabel" name="labelStatPar">
@@ -144,13 +158,20 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <widget class="DbViewer" name="tableViewLoad"/>
+        <widget class="DbViewer" name="tableViewLoad">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+        </widget>
         <widget class="QWidget" name="layoutWidget">
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <widget class="QLabel" name="labelLoadGlass">
             <property name="text">
-             <string>Стекло</string>
+             <string>Загрузка</string>
             </property>
            </widget>
           </item>
@@ -178,13 +199,13 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>DateEdit</class>
-   <extends>QDateEdit</extends>
+   <class>DbViewer</class>
+   <extends>QTableView</extends>
    <header>db/dbviewer.h</header>
   </customwidget>
   <customwidget>
-   <class>DbViewer</class>
-   <extends>QTableView</extends>
+   <class>DateEdit</class>
+   <extends>QDateEdit</extends>
    <header>db/dbviewer.h</header>
   </customwidget>
  </customwidgets>

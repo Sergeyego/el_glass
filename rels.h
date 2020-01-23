@@ -13,6 +13,7 @@ public:
     DbRelation *relKorr;
     DbRelation *relCons;
     DbRelation *relMatr;
+    DbRelation *relGlass;
     DbRelation *relPar;
     DbRelation *relSumpLoad;
 

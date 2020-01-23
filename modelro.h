@@ -7,15 +7,19 @@
 #include <QSqlQuery>
 #include <QSqlError>
 #include <QMessageBox>
+#include <QDebug>
 
 class ModelRo : public QSqlQueryModel
 {
+    Q_OBJECT
 public:
     ModelRo(QObject *parent);
     QVariant data(const QModelIndex &item, int role) const;
     bool execQuery(QSqlQuery &query);
 protected:
     int dec;
+public slots:
+    void select();
 };
 
 #endif // MODELRO_H
