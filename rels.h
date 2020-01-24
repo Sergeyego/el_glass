@@ -16,6 +16,9 @@ public:
     DbRelation *relGlass;
     DbRelation *relPar;
     DbRelation *relSumpLoad;
+    DbRelation *relKorrLoad;
+
+    void setSumpLoadFilter(QDate d);
 
 protected:
     explicit Rels(QObject *parent = 0);

@@ -67,4 +67,12 @@ private slots:
     void refreshInPar();
 };
 
+class ModelConsLoad : public DbTableModel
+{
+public:
+    ModelConsLoad(QObject *parent);
+    void refresh(QDate begDate, QDate endDate);
+    bool setData(const QModelIndex &index, const QVariant &value, int role);
+};
+
 #endif // MODELS_H

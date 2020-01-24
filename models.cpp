@@ -82,7 +82,6 @@ ModelKorrLoadData::ModelKorrLoadData(QObject *parent) : DbTableModel("glass_korr
     addColumn("id_sump_load",QString::fromUtf8("Отстойник"),NULL,Rels::instance()->relSumpLoad);
     addColumn("proc",QString::fromUtf8("Процент"),new QDoubleValidator(0,100,1,this));
     setSort("glass_korr_load_data.id_sump_load");
-    relation(1)->proxyModel()->setFilterKeyColumn(0);
 }
 
 void ModelKorrLoadData::refresh(int id_korr)
@@ -90,30 +89,6 @@ void ModelKorrLoadData::refresh(int id_korr)
     setFilter("glass_korr_load_data.id_load = "+QString::number(id_korr));
     setDefaultValue(0,id_korr);
     select();
-
-    QSqlQuery query;
-    query.prepare("select l.id from glass_sump_load as l "
-                  "where l.dat_load=(select max(ll.dat_load) from glass_sump_load as ll "
-                  "where ll.dat_load<= (select dat_load from glass_korr_load where id = :id1 ) and ll.id_sump=l.id_sump) "
-                  "union "
-                  "select l.id from glass_sump_load as l "
-                  "where l.dat_load=(select max(ll.dat_load) from glass_sump_load as ll "
-                  "where ll.dat_load<= (select dat_load-1 from glass_korr_load where id = :id2 ) and ll.id_sump=l.id_sump)");
-    query.bindValue(":id1",id_korr);
-    query.bindValue(":id2",id_korr);
-    if (query.exec()){
-        QString reg;
-        while (query.next()){
-            if (!reg.isEmpty()){
-                reg+="|";
-            }
-            reg+="^"+query.value(0).toString()+"$";
-        }
-        //qDebug()<<reg;
-        relation(1)->proxyModel()->setFilterRegExp(QRegExp(reg));
-    } else {
-        QMessageBox::critical(NULL,tr("Error"),query.lastError().text(),QMessageBox::Cancel);
-    }
 }
 
 ModelKorrLoadPar::ModelKorrLoadPar(QObject *parent) : DbTableModel("glass_korr_load_par",parent)
@@ -227,4 +202,30 @@ void ModelKorrStatData::refreshInPar()
     } else {
         QMessageBox::critical(NULL,tr("Error"),qu.lastError().text(),QMessageBox::Cancel);
     }
+}
+
+ModelConsLoad::ModelConsLoad(QObject *parent) : DbTableModel("glass_cons_load",parent)
+{
+    addColumn("id",QString::fromUtf8("id"));
+    addColumn("dat_load",QString::fromUtf8("Дата"));
+    addColumn("id_cons",QString::fromUtf8("Расх."),NULL,Rels::instance()->relCons);
+    addColumn("id_korr_load",QString::fromUtf8("Корректор"),NULL,Rels::instance()->relKorrLoad);
+    addColumn("parti_glass",QString::fromUtf8("Партия"));
+    addColumn("id_sump_load",QString::fromUtf8("Отстойник"),NULL,Rels::instance()->relSumpLoad);
+    setSort("glass_cons_load.dat_load, glass_cons_load.id_cons");
+}
+
+void ModelConsLoad::refresh(QDate begDate, QDate endDate)
+{
+    setFilter("glass_cons_load.dat_load between '"+begDate.toString("yyyy-MM-dd")+"' and '"+endDate.toString("yyyy-MM-dd")+"'");
+    select();
+}
+
+bool ModelConsLoad::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    bool ok=DbTableModel::setData(index,value,role);
+    /*if (ok && index.column()==1){
+        Rels::instance()->setSumpLoadFilter(value.toDate());
+    }*/
+    return ok;
 }

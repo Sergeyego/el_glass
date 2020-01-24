@@ -31,6 +31,7 @@ private slots:
     void updLoadData(QModelIndex ind);
     void updStatData(QModelIndex ind);
     void updStatCurrentTime();
+    void setLoadFilter(QModelIndex ind);
 };
 
 #endif // FORMKORR_H

@@ -77,6 +77,11 @@ FormKorr::FormKorr(QWidget *parent) :
     connect(modelKorrLoadPar,SIGNAL(sigUpd()),modelKorrStatPar,SLOT(select()));
     connect(modelKorrStatPar,SIGNAL(sigUpd()),modelKorrLoadPar,SLOT(select()));
 
+    DbDelegate *delegate=qobject_cast<DbDelegate *>(ui->tableViewLoadGlass->itemDelegate());
+    if (delegate){
+        connect(delegate,SIGNAL(createEdt(QModelIndex)),this,SLOT(setLoadFilter(QModelIndex)));
+    }
+
     updLoad();
 }
 
@@ -130,4 +135,12 @@ void FormKorr::updStatData(QModelIndex ind)
 void FormKorr::updStatCurrentTime()
 {
     ui->dateEdit->setDate(QDate::currentDate());
+}
+
+void FormKorr::setLoadFilter(QModelIndex ind)
+{
+    if (ind.column()==1){
+        QDate d=ui->tableViewLoad->model()->data(ui->tableViewLoad->model()->index(ui->tableViewLoad->currentIndex().row(),1),Qt::EditRole).toDate();
+        Rels::instance()->setSumpLoadFilter(d);
+    }
 }
