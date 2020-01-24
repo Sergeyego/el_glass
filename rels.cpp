@@ -23,7 +23,7 @@ Rels::Rels(QObject *parent) : QObject(parent)
                                          "from glass_sump_load as l "
                                          "inner join glass_sump as s on s.id=l.id_sump "
                                          "inner join matr as m on m.id=l.id_matr "
-                                         "order by l.dat_load desc, s.num");
+                                         "order by s.num, l.dat_load desc");
     relSumpLoad = new DbRelation(quSumpLoad,0,1,this);
 }
 

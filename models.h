@@ -55,12 +55,16 @@ public:
 
 class ModelKorrStatData : public ModelRo
 {
+    Q_OBJECT
 public:
     ModelKorrStatData(QObject *parent);
     void refresh(int id_load);
     QVariant data(const QModelIndex &item, int role) const;
 private:
     QMultiMap <int,QString> inPar;
+    int current_id_load;
+private slots:
+    void refreshInPar();
 };
 
 #endif // MODELS_H

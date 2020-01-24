@@ -9,7 +9,7 @@ ModelSumpLoad::ModelSumpLoad(QObject *parent) : DbTableModel("glass_sump_load",p
     addColumn("modul",QString::fromUtf8("Модуль"),new QDoubleValidator(0,100,1,this));
     addColumn("part_lump",QString::fromUtf8("Парт. гл."));
     addColumn("dat_cook",QString::fromUtf8("Дата развар."));
-    setSort("glass_sump_load.dat_load desc, glass_sump_load.id_sump");
+    setSort("glass_sump_load.dat_load, glass_sump_load.id_sump");
 }
 
 void ModelSumpLoad::refresh(QDate begDate, QDate endDate)
@@ -67,7 +67,7 @@ ModelKorrLoad::ModelKorrLoad(QObject *parent) : DbTableModel("glass_korr_load",p
     addColumn("id_korr",QString::fromUtf8("Корректор"),NULL,Rels::instance()->relKorr);
     addColumn("id_matr",QString::fromUtf8("Стекло"),NULL,Rels::instance()->relGlass);
     addColumn("parti_glass",QString::fromUtf8("Партия"));
-    setSort("glass_korr_load.dat_load desc, glass_korr_load.id_korr");
+    setSort("glass_korr_load.dat_load, glass_korr_load.id_korr");
 }
 
 void ModelKorrLoad::refresh(QDate begDate, QDate endDate)
@@ -82,6 +82,7 @@ ModelKorrLoadData::ModelKorrLoadData(QObject *parent) : DbTableModel("glass_korr
     addColumn("id_sump_load",QString::fromUtf8("Отстойник"),NULL,Rels::instance()->relSumpLoad);
     addColumn("proc",QString::fromUtf8("Процент"),new QDoubleValidator(0,100,1,this));
     setSort("glass_korr_load_data.id_sump_load");
+    relation(1)->proxyModel()->setFilterKeyColumn(0);
 }
 
 void ModelKorrLoadData::refresh(int id_korr)
@@ -89,6 +90,30 @@ void ModelKorrLoadData::refresh(int id_korr)
     setFilter("glass_korr_load_data.id_load = "+QString::number(id_korr));
     setDefaultValue(0,id_korr);
     select();
+
+    QSqlQuery query;
+    query.prepare("select l.id from glass_sump_load as l "
+                  "where l.dat_load=(select max(ll.dat_load) from glass_sump_load as ll "
+                  "where ll.dat_load<= (select dat_load from glass_korr_load where id = :id1 ) and ll.id_sump=l.id_sump) "
+                  "union "
+                  "select l.id from glass_sump_load as l "
+                  "where l.dat_load=(select max(ll.dat_load) from glass_sump_load as ll "
+                  "where ll.dat_load<= (select dat_load-1 from glass_korr_load where id = :id2 ) and ll.id_sump=l.id_sump)");
+    query.bindValue(":id1",id_korr);
+    query.bindValue(":id2",id_korr);
+    if (query.exec()){
+        QString reg;
+        while (query.next()){
+            if (!reg.isEmpty()){
+                reg+="|";
+            }
+            reg+="^"+query.value(0).toString()+"$";
+        }
+        //qDebug()<<reg;
+        relation(1)->proxyModel()->setFilterRegExp(QRegExp(reg));
+    } else {
+        QMessageBox::critical(NULL,tr("Error"),query.lastError().text(),QMessageBox::Cancel);
+    }
 }
 
 ModelKorrLoadPar::ModelKorrLoadPar(QObject *parent) : DbTableModel("glass_korr_load_par",parent)
@@ -134,10 +159,12 @@ void ModelKorrStat::refresh(QDate date)
 ModelKorrStatData::ModelKorrStatData(QObject *parent) : ModelRo(parent)
 {
     dec=1;
+    connect(this,SIGNAL(newQuery()),this,SLOT(refreshInPar()));
 }
 
 void ModelKorrStatData::refresh(int id_load)
 {
+    current_id_load=id_load;
     QSqlQuery query;
     query.prepare("select l.id, d.proc, m.nam, s.num, l.dat_load, l.part_lump, l.modul, l.dat_cook "
                   "from glass_korr_load_data as d "
@@ -150,18 +177,54 @@ void ModelKorrStatData::refresh(int id_load)
         setHeaderData(1,Qt::Horizontal,QString::fromUtf8("%"));
         setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Глыба"));
         setHeaderData(3,Qt::Horizontal,QString::fromUtf8("Отстой."));
-        setHeaderData(4,Qt::Horizontal,QString::fromUtf8("Дата \nзагр. отст."));
+        setHeaderData(4,Qt::Horizontal,QString::fromUtf8("Дата загр.\nотстойника"));
         setHeaderData(5,Qt::Horizontal,QString::fromUtf8("Партия \nглыбы"));
         setHeaderData(6,Qt::Horizontal,QString::fromUtf8("Модуль"));
         setHeaderData(7,Qt::Horizontal,QString::fromUtf8("Дата \nразварки"));
     }
-
-    //QSqlQuery qu;
-    //qu.prepare("select d.id_sump_load from glass_korr_load_data as d where d.id_load = :id_load");
-    //qu.bindValue(":id_load",id_load);
 }
 
 QVariant ModelKorrStatData::data(const QModelIndex &item, int role) const
 {
+    if (role==Qt::ToolTipRole){
+        int id=ModelRo::data(index(item.row(),0),Qt::EditRole).toInt();
+        QString str;
+        QList<QString> l=inPar.values(id);
+        foreach (QString s, l) {
+            if (!str.isEmpty()){
+                str+="\n";
+            }
+            str+=s;
+        }
+        if (!str.isEmpty()){
+            QString gl=ModelRo::data(index(item.row(),2),Qt::EditRole).toString();
+            str.prepend(QString::fromUtf8("Входные параметры ")+gl+QString::fromUtf8(":\n"));
+        }
+        return str;
+    }
     return ModelRo::data(item,role);
+}
+
+void ModelKorrStatData::refreshInPar()
+{
+    QSqlQuery qu;
+    qu.prepare("select sl.id, p.nam, lp.val, lp.temp "
+               "from glass_korr_load_data as d "
+               "inner join glass_sump_load as sl on sl.id=d.id_sump_load "
+               "inner join glass_sump_load_par as lp on lp.id_load=sl.id "
+               "inner join glass_par as p on p.id=lp.id_param "
+               "where d.id_load = :id_load");
+    qu.bindValue(":id_load",current_id_load);
+    inPar.clear();
+    if (qu.exec()){
+        while (qu.next()){
+            QString val=qu.value(1).toString()+QString::fromUtf8(" = ")+qu.value(2).toString();
+            if (!qu.value(3).isNull()){
+                val+=QString::fromUtf8(" (")+qu.value(3).toString()+QString::fromUtf8("°С)");
+            }
+            inPar.insert(qu.value(0).toInt(),val);
+        }
+    } else {
+        QMessageBox::critical(NULL,tr("Error"),qu.lastError().text(),QMessageBox::Cancel);
+    }
 }

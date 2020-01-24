@@ -16,10 +16,13 @@ public:
     ModelRo(QObject *parent);
     QVariant data(const QModelIndex &item, int role) const;
     bool execQuery(QSqlQuery &query);
+    void setQuery(const QSqlQuery &query);
 protected:
     int dec;
 public slots:
     void select();
+signals:
+    void newQuery();
 };
 
 #endif // MODELRO_H

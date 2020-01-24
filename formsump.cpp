@@ -62,6 +62,7 @@ FormSump::FormSump(QWidget *parent) :
     connect(modelSumpStatPar,SIGNAL(sigUpd()),modelSumpLoadPar,SLOT(select()));
     connect(ui->dateEdit,SIGNAL(dateChanged(QDate)),this,SLOT(updStat()));
     connect(ui->pushButtonCurTime,SIGNAL(clicked(bool)),this,SLOT(updStatCurrentTime()));
+    connect(modelSumpLoad,SIGNAL(sigUpd()),Rels::instance()->relSumpLoad,SLOT(refreshModel()));
 
     updLoad();
 }

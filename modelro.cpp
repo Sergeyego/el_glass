@@ -34,6 +34,12 @@ bool ModelRo::execQuery(QSqlQuery &query)
     return ok;
 }
 
+void ModelRo::setQuery(const QSqlQuery &query)
+{
+    QSqlQueryModel::setQuery(query);
+    emit newQuery();
+}
+
 void ModelRo::select()
 {
     QSqlQuery q(query());
