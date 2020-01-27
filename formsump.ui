@@ -81,7 +81,7 @@
           <item>
            <widget class="QLabel" name="labelStat">
             <property name="text">
-             <string>Требуемые выходные параметры</string>
+             <string>Входные параметры</string>
             </property>
            </widget>
           </item>

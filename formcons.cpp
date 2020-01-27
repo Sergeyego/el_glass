@@ -9,9 +9,6 @@ FormCons::FormCons(QWidget *parent) :
     ui->pushButtonUpdCurrentTime->setIcon(this->style()->standardIcon(QStyle::SP_BrowserReload));
     ui->pushButtonUpd->setIcon(this->style()->standardIcon(QStyle::SP_BrowserReload));
 
-    //ui->splitterStat->setStretchFactor(0,3);
-    //ui->splitterStat->setStretchFactor(1,1);
-
     ui->dateEdit->setDate(QDate::currentDate());
     ui->dateEditBeg->setDate(QDate::currentDate().addDays(-7));
     ui->dateEditEnd->setDate(QDate::currentDate());
@@ -22,6 +19,7 @@ FormCons::FormCons(QWidget *parent) :
     ui->tableViewStatPar->setColumnWidth(1,120);
     ui->tableViewStatPar->setColumnWidth(2,70);
     ui->tableViewStatPar->setColumnWidth(3,70);
+    ui->tableViewStatPar->setColumnWidth(4,80);
 
     modelConsStatData = new ModelConsStatData(this);
     modelConsStatData->refresh(-1);

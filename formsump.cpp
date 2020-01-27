@@ -72,7 +72,7 @@ void FormSump::updStatPar(QModelIndex ind)
     int id_sump=ui->tableViewStat->model()->data(ui->tableViewStat->model()->index(ind.row(),0),Qt::EditRole).toInt();
     QString sump=ui->tableViewStat->model()->data(ui->tableViewStat->model()->index(ind.row(),1),Qt::DisplayRole).toString();
     modelSumpStatPar->refresh(id_sump);
-    ui->labelStat->setText(QString::fromUtf8("Выходные параметры для отстойника ")+"<b>"+sump+"</b>");
+    ui->labelStat->setText(QString::fromUtf8("Входные параметры для отстойника ")+"<b>"+sump+"</b>");
 }
 
 void FormSump::updStat()

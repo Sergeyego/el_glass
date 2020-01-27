@@ -9,6 +9,7 @@ class ModelSumpLoad : public DbTableModel
 public:
     ModelSumpLoad(QObject *parent);
     void refresh(QDate begDate, QDate endDate);
+    bool insertRow(int row, const QModelIndex &parent);
 };
 
 class ModelSumpLoadPar : public DbTableModel
@@ -30,6 +31,7 @@ class ModelKorrLoad : public DbTableModel
 public:
     ModelKorrLoad(QObject *parent);
     void refresh(QDate begDate, QDate endDate);
+    bool insertRow(int row, const QModelIndex &parent);
 };
 
 class ModelKorrLoadData : public DbTableModel
@@ -73,6 +75,7 @@ public:
     ModelConsLoad(QObject *parent);
     void refresh(QDate begDate, QDate endDate);
     bool setData(const QModelIndex &index, const QVariant &value, int role);
+    bool insertRow(int row, const QModelIndex &parent);
 };
 
 class ModelConsLoadPar : public DbTableModel
@@ -80,6 +83,7 @@ class ModelConsLoadPar : public DbTableModel
 public:
     ModelConsLoadPar(QObject *parent);
     void refresh(int id_cons);
+    bool insertRow(int row, const QModelIndex &parent);
 };
 
 class ModelConsStat : public ModelRo
@@ -95,12 +99,12 @@ class ModelConsStatData : public ModelRo
 public:
     ModelConsStatData(QObject *parent);
     void refresh(int id_load);
-/*    QVariant data(const QModelIndex &item, int role) const;
+    QVariant data(const QModelIndex &item, int role) const;
 private:
     QMultiMap <int,QString> inPar;
     int current_id_load;
 private slots:
-    void refreshInPar();*/
+    void refreshInPar();
 };
 
 #endif // MODELS_H

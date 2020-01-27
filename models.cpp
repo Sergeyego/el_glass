@@ -18,6 +18,12 @@ void ModelSumpLoad::refresh(QDate begDate, QDate endDate)
     select();
 }
 
+bool ModelSumpLoad::insertRow(int row, const QModelIndex &parent)
+{
+    setDefaultValue(1,QDate::currentDate());
+    return DbTableModel::insertRow(row,parent);
+}
+
 ModelSumpLoadPar::ModelSumpLoadPar(QObject *parent) : DbTableModel("glass_sump_load_par",parent)
 {
     addColumn("id_load",QString::fromUtf8("id_load"));
@@ -74,6 +80,12 @@ void ModelKorrLoad::refresh(QDate begDate, QDate endDate)
 {
     setFilter("glass_korr_load.dat_load between '"+begDate.toString("yyyy-MM-dd")+"' and '"+endDate.toString("yyyy-MM-dd")+"'");
     select();
+}
+
+bool ModelKorrLoad::insertRow(int row, const QModelIndex &parent)
+{
+    setDefaultValue(1,QDate::currentDate());
+    return DbTableModel::insertRow(row,parent);
 }
 
 ModelKorrLoadData::ModelKorrLoadData(QObject *parent) : DbTableModel("glass_korr_load_data",parent)
@@ -173,7 +185,7 @@ QVariant ModelKorrStatData::data(const QModelIndex &item, int role) const
         }
         if (!str.isEmpty()){
             QString gl=ModelRo::data(index(item.row(),2),Qt::EditRole).toString();
-            str.prepend(QString::fromUtf8("Входные параметры ")+gl+QString::fromUtf8(":\n"));
+            str.prepend(QString::fromUtf8("Параметры отстойника ")+gl+QString::fromUtf8(":\n"));
         }
         return str;
     }
@@ -232,13 +244,20 @@ bool ModelConsLoad::setData(const QModelIndex &index, const QVariant &value, int
     return ok;
 }
 
+bool ModelConsLoad::insertRow(int row, const QModelIndex &parent)
+{
+    setDefaultValue(1,QDate::currentDate());
+    return DbTableModel::insertRow(row,parent);
+}
+
 ModelConsLoadPar::ModelConsLoadPar(QObject *parent) : DbTableModel("glass_cons_load_par",parent)
 {
     addColumn("id_load",QString::fromUtf8("id_load"));
     addColumn("id_param",QString::fromUtf8("Параметр"),NULL,Rels::instance()->relPar);
     addColumn("val",QString::fromUtf8("Значение"),new QDoubleValidator(0,1000000,3,this));
     addColumn("temp",QString::fromUtf8("Т изм.,°С"),new QDoubleValidator(-100,100,1,this));
-    setSort("glass_cons_load_par.id_param");
+    addColumn("dat",QString::fromUtf8("Дата изм."));
+    setSort("glass_cons_load_par.id_param, glass_cons_load_par.dat");
     setDefaultValue(3,23.0);
 }
 
@@ -247,6 +266,12 @@ void ModelConsLoadPar::refresh(int id_cons)
     setFilter("glass_cons_load_par.id_load = "+QString::number(id_cons));
     setDefaultValue(0,id_cons);
     select();
+}
+
+bool ModelConsLoadPar::insertRow(int row, const QModelIndex &parent)
+{
+    setDefaultValue(4,QDate::currentDate());
+    return DbTableModel::insertRow(row,parent);
 }
 
 ModelConsStat::ModelConsStat(QObject *parent): ModelRo(parent)
@@ -281,11 +306,12 @@ void ModelConsStat::refresh(QDate date)
 ModelConsStatData::ModelConsStatData(QObject *parent) :ModelRo(parent)
 {
     dec=1;
+    connect(this,SIGNAL(newQuery()),this,SLOT(refreshInPar()));
 }
 
 void ModelConsStatData::refresh(int id_load)
 {
-    //current_id_load=id_load;
+    current_id_load=id_load;
     QSqlQuery query;
     query.prepare("(select d.id_load, d.proc, m.nam, s.num, l.dat_load, l.part_lump, l.modul, l.dat_cook, NULL "
                   "from glass_korr_load_data as d "
@@ -309,5 +335,49 @@ void ModelConsStatData::refresh(int id_load)
         setHeaderData(5,Qt::Horizontal,QString::fromUtf8("Партия \nглыбы"));
         setHeaderData(6,Qt::Horizontal,QString::fromUtf8("Модуль"));
         setHeaderData(7,Qt::Horizontal,QString::fromUtf8("Дата \nразварки"));
+    }
+}
+
+QVariant ModelConsStatData::data(const QModelIndex &item, int role) const
+{
+    if (role==Qt::ToolTipRole){
+        QVariant id=ModelRo::data(index(item.row(),0),Qt::EditRole);
+        if (!id.isNull()){
+            QString str;
+            QList<QString> l=inPar.values(id.toInt());
+            foreach (QString s, l) {
+                if (!str.isEmpty()){
+                    str+="\n";
+                }
+                str+=s;
+            }
+            if (!str.isEmpty()){
+                str.prepend(QString::fromUtf8("Параметры корректора ")+QString::fromUtf8(":\n"));
+            }
+            return str;
+        }
+    }
+    return ModelRo::data(item,role);
+}
+
+void ModelConsStatData::refreshInPar()
+{
+    QSqlQuery qu;
+    qu.prepare("select l.id_load, p.nam, l.val, l.temp "
+               "from glass_korr_load_par as l "
+               "inner join glass_par as p on p.id=l.id_param "
+               "where l.id_load = (select id_korr_load from glass_cons_load where id= :id_load)");
+    qu.bindValue(":id_load",current_id_load);
+    inPar.clear();
+    if (qu.exec()){
+        while (qu.next()){
+            QString val=qu.value(1).toString()+QString::fromUtf8(" = ")+qu.value(2).toString();
+            if (!qu.value(3).isNull()){
+                val+=QString::fromUtf8(" (")+qu.value(3).toString()+QString::fromUtf8("°С)");
+            }
+            inPar.insert(qu.value(0).toInt(),val);
+        }
+    } else {
+        QMessageBox::critical(NULL,tr("Error"),qu.lastError().text(),QMessageBox::Cancel);
     }
 }
