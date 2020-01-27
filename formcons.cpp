@@ -75,6 +75,8 @@ FormCons::~FormCons()
 
 void FormCons::updLoad()
 {
+    Rels::instance()->relSumpLoad->refreshModel();
+    Rels::instance()->relKorrLoad->refreshModel();
     modelConsLoad->refresh(ui->dateEditBeg->date(),ui->dateEditEnd->date());
     if (ui->tableViewLoad->model()->rowCount()){
         ui->tableViewLoad->setCurrentIndex(ui->tableViewLoad->model()->index(0,1));
