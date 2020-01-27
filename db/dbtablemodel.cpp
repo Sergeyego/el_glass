@@ -643,6 +643,11 @@ QVariant DbRelation::data(QString key)
     return relQueryModel->data(dict.value(key,QModelIndex()),Qt::EditRole);
 }
 
+QModelIndex DbRelation::modelIndex(QString key)
+{
+    return dict.value(key,QModelIndex());
+}
+
 QAbstractItemModel *DbRelation::model() const
 {
     return relQueryModel;

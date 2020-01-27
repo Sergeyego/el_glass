@@ -76,6 +76,7 @@ FormKorr::FormKorr(QWidget *parent) :
     connect(modelKorrLoadData,SIGNAL(sigUpd()),modelKorrStatData,SLOT(select()));
     connect(modelKorrLoadPar,SIGNAL(sigUpd()),modelKorrStatPar,SLOT(select()));
     connect(modelKorrStatPar,SIGNAL(sigUpd()),modelKorrLoadPar,SLOT(select()));
+    connect(modelKorrLoad,SIGNAL(sigUpd()),Rels::instance()->relKorrLoad,SLOT(refreshModel()));
 
     DbDelegate *delegate=qobject_cast<DbDelegate *>(ui->tableViewLoadGlass->itemDelegate());
     if (delegate){

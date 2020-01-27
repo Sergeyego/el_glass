@@ -19,12 +19,15 @@ public:
 private:
     Ui::FormCons *ui;
     ModelConsLoad *modelConsLoad;
+    ModelConsLoadPar *modelConsLoadPar;
+    ModelConsStat *modelConsStat;
+    ModelConsStatData *modelConsStatData;
 
 private slots:
     void updLoad();
     void updStat();
     void setLoadFilter(QModelIndex ind);
-    void updStatPar(QModelIndex ind);
+    void updStatData(QModelIndex ind);
     void updStatCurrentTime();
 };
 

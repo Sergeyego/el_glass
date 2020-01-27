@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>786</width>
-    <height>584</height>
+    <width>784</width>
+    <height>582</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -59,11 +59,35 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
-        <widget class="DbViewer" name="tableViewStat"/>
+        <widget class="DbViewer" name="tableViewStat">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::SingleSelection</enum>
+         </property>
+         <property name="selectionBehavior">
+          <enum>QAbstractItemView::SelectRows</enum>
+         </property>
+         <attribute name="verticalHeaderVisible">
+          <bool>false</bool>
+         </attribute>
+        </widget>
         <widget class="QWidget" name="layoutWidget">
          <layout class="QVBoxLayout" name="verticalLayout">
           <item>
-           <widget class="QLabel" name="labelParStat">
+           <widget class="QLabel" name="labelStatData">
+            <property name="text">
+             <string>Стекло в расходнике</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="DbViewer" name="tableViewStatGlass">
+            <attribute name="verticalHeaderVisible">
+             <bool>false</bool>
+            </attribute>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="labelStatPar">
             <property name="text">
              <string>Выходные параметры стекла</string>
             </property>

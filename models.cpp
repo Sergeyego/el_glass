@@ -5,9 +5,9 @@ ModelSumpLoad::ModelSumpLoad(QObject *parent) : DbTableModel("glass_sump_load",p
     addColumn("id",QString::fromUtf8("id"));
     addColumn("dat_load",QString::fromUtf8("Дата"));
     addColumn("id_sump",QString::fromUtf8("Отстой."),NULL,Rels::instance()->relSump);
-    addColumn("id_matr",QString::fromUtf8("Глыба"),NULL,Rels::instance()->relMatr);
+    addColumn("id_matr",QString::fromUtf8("Стекло"),NULL,Rels::instance()->relGlass);
     addColumn("modul",QString::fromUtf8("Модуль"),new QDoubleValidator(0,100,1,this));
-    addColumn("part_lump",QString::fromUtf8("Парт. гл."));
+    addColumn("part_lump",QString::fromUtf8("Парт.глыбы"));
     addColumn("dat_cook",QString::fromUtf8("Дата развар."));
     setSort("glass_sump_load.dat_load, glass_sump_load.id_sump");
 }
@@ -53,7 +53,7 @@ void ModelSumpStat::refresh(QDate date)
     if (execQuery(query)){
         setHeaderData(1,Qt::Horizontal,QString::fromUtf8("Отстой."));
         setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Дата загр."));
-        setHeaderData(3,Qt::Horizontal,QString::fromUtf8("Глыба"));
+        setHeaderData(3,Qt::Horizontal,QString::fromUtf8("Слекло"));
         setHeaderData(4,Qt::Horizontal,QString::fromUtf8("Модуль"));
         setHeaderData(5,Qt::Horizontal,QString::fromUtf8("Парт. гл."));
         setHeaderData(6,Qt::Horizontal,QString::fromUtf8("Дата развар."));
@@ -79,7 +79,7 @@ void ModelKorrLoad::refresh(QDate begDate, QDate endDate)
 ModelKorrLoadData::ModelKorrLoadData(QObject *parent) : DbTableModel("glass_korr_load_data",parent)
 {
     addColumn("id_load",QString::fromUtf8("id_load"));
-    addColumn("id_sump_load",QString::fromUtf8("Отстойник"),NULL,Rels::instance()->relSumpLoad);
+    addColumn("id_sump_load",QString::fromUtf8("Из отстойника"),NULL,Rels::instance()->relSumpLoad);
     addColumn("proc",QString::fromUtf8("Процент"),new QDoubleValidator(0,100,1,this));
     setSort("glass_korr_load_data.id_sump_load");
 }
@@ -150,7 +150,7 @@ void ModelKorrStatData::refresh(int id_load)
     query.bindValue(":id_load",id_load);
     if (execQuery(query)){
         setHeaderData(1,Qt::Horizontal,QString::fromUtf8("%"));
-        setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Глыба"));
+        setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Стекло"));
         setHeaderData(3,Qt::Horizontal,QString::fromUtf8("Отстой."));
         setHeaderData(4,Qt::Horizontal,QString::fromUtf8("Дата загр.\nотстойника"));
         setHeaderData(5,Qt::Horizontal,QString::fromUtf8("Партия \nглыбы"));
@@ -209,9 +209,9 @@ ModelConsLoad::ModelConsLoad(QObject *parent) : DbTableModel("glass_cons_load",p
     addColumn("id",QString::fromUtf8("id"));
     addColumn("dat_load",QString::fromUtf8("Дата"));
     addColumn("id_cons",QString::fromUtf8("Расх."),NULL,Rels::instance()->relCons);
-    addColumn("id_korr_load",QString::fromUtf8("Корректор"),NULL,Rels::instance()->relKorrLoad);
+    addColumn("id_korr_load",QString::fromUtf8("Из корректора"),NULL,Rels::instance()->relKorrLoad);
     addColumn("parti_glass",QString::fromUtf8("Партия"));
-    addColumn("id_sump_load",QString::fromUtf8("Отстойник"),NULL,Rels::instance()->relSumpLoad);
+    addColumn("id_sump_load",QString::fromUtf8("Из отстойника"),NULL,Rels::instance()->relSumpLoad);
     setSort("glass_cons_load.dat_load, glass_cons_load.id_cons");
 }
 
@@ -224,8 +224,90 @@ void ModelConsLoad::refresh(QDate begDate, QDate endDate)
 bool ModelConsLoad::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     bool ok=DbTableModel::setData(index,value,role);
-    /*if (ok && index.column()==1){
-        Rels::instance()->setSumpLoadFilter(value.toDate());
-    }*/
+    if (ok && index.column()==3){
+        QModelIndex ind=relation(3)->model()->index(relation(3)->modelIndex(value.toString()).row(),2);
+        QVariant part=relation(3)->model()->data(ind,Qt::EditRole);
+        setData(this->index(index.row(),4),part,Qt::EditRole);
+    }
     return ok;
+}
+
+ModelConsLoadPar::ModelConsLoadPar(QObject *parent) : DbTableModel("glass_cons_load_par",parent)
+{
+    addColumn("id_load",QString::fromUtf8("id_load"));
+    addColumn("id_param",QString::fromUtf8("Параметр"),NULL,Rels::instance()->relPar);
+    addColumn("val",QString::fromUtf8("Значение"),new QDoubleValidator(0,1000000,3,this));
+    addColumn("temp",QString::fromUtf8("Т изм.,°С"),new QDoubleValidator(-100,100,1,this));
+    setSort("glass_cons_load_par.id_param");
+    setDefaultValue(3,23.0);
+}
+
+void ModelConsLoadPar::refresh(int id_cons)
+{
+    setFilter("glass_cons_load_par.id_load = "+QString::number(id_cons));
+    setDefaultValue(0,id_cons);
+    select();
+}
+
+ModelConsStat::ModelConsStat(QObject *parent): ModelRo(parent)
+{
+
+}
+
+void ModelConsStat::refresh(QDate date)
+{
+    QSqlQuery query;
+    query.prepare("select l.id, c.num, l.dat_load, COALESCE(mk.nam, ms.nam), l.parti_glass, k.num, gl.dat_load "
+                  "from glass_cons_load as l "
+                  "inner join glass_cons as c on c.id=l.id_cons "
+                  "left join glass_korr_load as gl on gl.id=l.id_korr_load "
+                  "left join glass_korr as k on k.id=gl.id_korr "
+                  "left join matr as mk on mk.id=gl.id_matr "
+                  "left join glass_sump_load as sl on sl.id=l.id_sump_load "
+                  "left join matr as ms on ms.id=sl.id_matr "
+                  "where l.dat_load=(select max(ll.dat_load) from glass_cons_load as ll where ll.dat_load<= :dat and ll.id_cons=l.id_cons) "
+                  "order by c.num");
+    query.bindValue(":dat",date);
+    if (execQuery(query)){
+        setHeaderData(1,Qt::Horizontal,QString::fromUtf8("Расх."));
+        setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Дата загр."));
+        setHeaderData(3,Qt::Horizontal,QString::fromUtf8("Стекло"));
+        setHeaderData(4,Qt::Horizontal,QString::fromUtf8("Партия"));
+        setHeaderData(5,Qt::Horizontal,QString::fromUtf8("Коррект."));
+        setHeaderData(6,Qt::Horizontal,QString::fromUtf8("Загр.кор."));
+    }
+}
+
+ModelConsStatData::ModelConsStatData(QObject *parent) :ModelRo(parent)
+{
+    dec=1;
+}
+
+void ModelConsStatData::refresh(int id_load)
+{
+    //current_id_load=id_load;
+    QSqlQuery query;
+    query.prepare("(select d.id_load, d.proc, m.nam, s.num, l.dat_load, l.part_lump, l.modul, l.dat_cook, NULL "
+                  "from glass_korr_load_data as d "
+                  "inner join glass_sump_load as l on l.id=d.id_sump_load "
+                  "inner join matr as m on m.id=l.id_matr "
+                  "inner join glass_sump as s on s.id=l.id_sump "
+                  "where d.id_load = (select id_korr_load from glass_cons_load where id = :id_load1 ) order by proc) "
+                  "union "
+                  "(select NULL, 100.0, mm.nam, ss.num, ll.dat_load, ll.part_lump, ll.modul, ll.dat_cook, ll.id "
+                  "from glass_sump_load as ll "
+                  "inner join matr as mm on mm.id=ll.id_matr "
+                  "inner join glass_sump as ss on ss.id=ll.id_sump "
+                  "where ll.id = (select id_sump_load from glass_cons_load where id = :id_load2 ))");
+    query.bindValue(":id_load1",id_load);
+    query.bindValue(":id_load2",id_load);
+    if (execQuery(query)){
+        setHeaderData(1,Qt::Horizontal,QString::fromUtf8("%"));
+        setHeaderData(2,Qt::Horizontal,QString::fromUtf8("Стекло"));
+        setHeaderData(3,Qt::Horizontal,QString::fromUtf8("Отстой."));
+        setHeaderData(4,Qt::Horizontal,QString::fromUtf8("Дата загр.\nотстойника"));
+        setHeaderData(5,Qt::Horizontal,QString::fromUtf8("Партия \nглыбы"));
+        setHeaderData(6,Qt::Horizontal,QString::fromUtf8("Модуль"));
+        setHeaderData(7,Qt::Horizontal,QString::fromUtf8("Дата \nразварки"));
+    }
 }

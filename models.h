@@ -75,4 +75,32 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role);
 };
 
+class ModelConsLoadPar : public DbTableModel
+{
+public:
+    ModelConsLoadPar(QObject *parent);
+    void refresh(int id_cons);
+};
+
+class ModelConsStat : public ModelRo
+{
+public:
+    ModelConsStat(QObject *parent);
+    void refresh(QDate date);
+};
+
+class ModelConsStatData : public ModelRo
+{
+    Q_OBJECT
+public:
+    ModelConsStatData(QObject *parent);
+    void refresh(int id_load);
+/*    QVariant data(const QModelIndex &item, int role) const;
+private:
+    QMultiMap <int,QString> inPar;
+    int current_id_load;
+private slots:
+    void refreshInPar();*/
+};
+
 #endif // MODELS_H

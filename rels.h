@@ -19,6 +19,7 @@ public:
     DbRelation *relKorrLoad;
 
     void setSumpLoadFilter(QDate d);
+    void setKorrLoadFilter(QDate d);
 
 protected:
     explicit Rels(QObject *parent = 0);

@@ -29,8 +29,33 @@ void Rels::setSumpLoadFilter(QDate d)
             }
             reg+="^"+query.value(0).toString()+"$";
         }
-        //qDebug()<<reg;
         relSumpLoad->proxyModel()->setFilterRegExp(QRegExp(reg));
+    } else {
+        QMessageBox::critical(NULL,tr("Error"),query.lastError().text(),QMessageBox::Cancel);
+    }
+}
+
+void Rels::setKorrLoadFilter(QDate d)
+{
+    QSqlQuery query;
+    query.prepare("select l.id from glass_korr_load as l "
+                  "where l.dat_load=(select max(ll.dat_load) from glass_korr_load as ll "
+                  "where ll.dat_load<= :d1 and ll.id_korr=l.id_korr) "
+                  "union "
+                  "select l.id from glass_korr_load as l "
+                  "where l.dat_load=(select max(ll.dat_load) from glass_korr_load as ll "
+                  "where ll.dat_load<= :d2 and ll.id_korr=l.id_korr)");
+    query.bindValue(":d1",d);
+    query.bindValue(":d2",d.addDays(-1));
+    if (query.exec()){
+        QString reg;
+        while (query.next()){
+            if (!reg.isEmpty()){
+                reg+="|";
+            }
+            reg+="^"+query.value(0).toString()+"$";
+        }
+        relKorrLoad->proxyModel()->setFilterRegExp(QRegExp(reg));
     } else {
         QMessageBox::critical(NULL,tr("Error"),query.lastError().text(),QMessageBox::Cancel);
     }
@@ -60,6 +85,7 @@ Rels::Rels(QObject *parent) : QObject(parent)
     relKorrLoad = new DbRelation(quKorrLoad,0,1,this);
 
     relSumpLoad->proxyModel()->setFilterKeyColumn(0);
+    relKorrLoad->proxyModel()->setFilterKeyColumn(0);
 }
 
 void Rels::refresh()
