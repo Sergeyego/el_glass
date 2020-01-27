@@ -24,13 +24,6 @@ FormKorr::FormKorr(QWidget *parent) :
     ui->tableViewLoadGlass->setColumnWidth(1,350);
     ui->tableViewLoadGlass->setColumnWidth(2,70);
 
-    modelKorrLoadPar = new ModelKorrLoadPar(this);
-    ui->tableViewLoadPar->setModel(modelKorrLoadPar);
-    ui->tableViewLoadPar->setColumnHidden(0,true);
-    ui->tableViewLoadPar->setColumnWidth(1,120);
-    ui->tableViewLoadPar->setColumnWidth(2,70);
-    ui->tableViewLoadPar->setColumnWidth(3,70);
-
     modelKorrLoad = new ModelKorrLoad(this);
     ui->tableViewLoad->setModel(modelKorrLoad);
     ui->tableViewLoad->setColumnHidden(0,true);
@@ -74,8 +67,6 @@ FormKorr::FormKorr(QWidget *parent) :
     connect(ui->pushButtonUpdCurrentTime,SIGNAL(clicked(bool)),this,SLOT(updStatCurrentTime()));
     connect(modelKorrLoad,SIGNAL(sigUpd()),this,SLOT(updStat()));
     connect(modelKorrLoadData,SIGNAL(sigUpd()),modelKorrStatData,SLOT(select()));
-    connect(modelKorrLoadPar,SIGNAL(sigUpd()),modelKorrStatPar,SLOT(select()));
-    connect(modelKorrStatPar,SIGNAL(sigUpd()),modelKorrLoadPar,SLOT(select()));
     connect(modelKorrLoad,SIGNAL(sigUpd()),Rels::instance()->relKorrLoad,SLOT(refreshModel()));
 
     DbDelegate *delegate=qobject_cast<DbDelegate *>(ui->tableViewLoadGlass->itemDelegate());
@@ -113,14 +104,10 @@ void FormKorr::updStat()
 void FormKorr::updLoadData(QModelIndex ind)
 {
     ui->tableViewLoadGlass->setEnabled(!modelKorrLoad->isAdd());
-    ui->tableViewLoadPar->setEnabled(!modelKorrLoad->isAdd());
     int id_korr=ui->tableViewLoad->model()->data(ui->tableViewLoad->model()->index(ind.row(),0),Qt::EditRole).toInt();
     QString korr=ui->tableViewLoad->model()->data(ui->tableViewLoad->model()->index(ind.row(),2),Qt::DisplayRole).toString();
     modelKorrLoadData->refresh(id_korr);
     ui->labelLoadGlass->setText(QString::fromUtf8("Загрузка корректора ")+"<b>"+korr+"</b>");
-
-    modelKorrLoadPar->refresh(id_korr);
-    ui->labelLoadPar->setText(QString::fromUtf8("Выходные параметры стекла для корректора ")+"<b>"+korr+"</b>");
 }
 
 void FormKorr::updStatData(QModelIndex ind)

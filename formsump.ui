@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>713</width>
-    <height>597</height>
+    <width>711</width>
+    <height>595</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -146,38 +146,13 @@
        </layout>
       </item>
       <item>
-       <widget class="QSplitter" name="splitterLoad">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+       <widget class="DbViewer" name="tableViewLoad">
+        <property name="selectionMode">
+         <enum>QAbstractItemView::SingleSelection</enum>
         </property>
-        <widget class="QWidget" name="layoutWidget">
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <widget class="DbViewer" name="tableViewLoad">
-            <property name="selectionMode">
-             <enum>QAbstractItemView::SingleSelection</enum>
-            </property>
-            <property name="selectionBehavior">
-             <enum>QAbstractItemView::SelectRows</enum>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
-        <widget class="QWidget" name="layoutWidget">
-         <layout class="QVBoxLayout" name="verticalLayout_6">
-          <item>
-           <widget class="QLabel" name="labelLoad">
-            <property name="text">
-             <string>Требуемые выходные параметры</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="DbViewer" name="tableViewLoadPar"/>
-          </item>
-         </layout>
-        </widget>
+        <property name="selectionBehavior">
+         <enum>QAbstractItemView::SelectRows</enum>
+        </property>
        </widget>
       </item>
      </layout>

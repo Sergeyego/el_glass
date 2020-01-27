@@ -20,7 +20,6 @@ private:
     Ui::FormKorr *ui;
     ModelKorrLoad *modelKorrLoad;
     ModelKorrLoadData *modelKorrLoadData;
-    ModelKorrLoadPar *modelKorrLoadPar;
     ModelKorrStat *modelKorrStat;
     ModelKorrStatData *modelKorrStatData;
     ModelKorrLoadPar *modelKorrStatPar;

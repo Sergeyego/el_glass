@@ -19,13 +19,11 @@ public:
 private:
     Ui::FormSump *ui;
     ModelSumpLoad *modelSumpLoad;
-    ModelSumpLoadPar *modelSumpLoadPar;
     ModelSumpStat *modelSumpStat;
     ModelSumpLoadPar *modelSumpStatPar;
 
 private slots:
     void updLoad();
-    void updLoadPar(QModelIndex ind);
     void updStatPar(QModelIndex ind);
     void updStat();
     void updStatCurrentTime();

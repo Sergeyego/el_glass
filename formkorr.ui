@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>858</width>
-    <height>685</height>
+    <width>856</width>
+    <height>683</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -178,16 +178,6 @@
           <item>
            <widget class="DbViewer" name="tableViewLoadGlass"/>
           </item>
-          <item>
-           <widget class="QLabel" name="labelLoadPar">
-            <property name="text">
-             <string>Выходные параметры стекла</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="DbViewer" name="tableViewLoadPar"/>
-          </item>
          </layout>
         </widget>
        </widget>
@@ -199,13 +189,13 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>DbViewer</class>
-   <extends>QTableView</extends>
+   <class>DateEdit</class>
+   <extends>QDateEdit</extends>
    <header>db/dbviewer.h</header>
   </customwidget>
   <customwidget>
-   <class>DateEdit</class>
-   <extends>QDateEdit</extends>
+   <class>DbViewer</class>
+   <extends>QTableView</extends>
    <header>db/dbviewer.h</header>
   </customwidget>
  </customwidgets>
