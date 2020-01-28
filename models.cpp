@@ -109,6 +109,7 @@ ModelKorrLoadPar::ModelKorrLoadPar(QObject *parent) : DbTableModel("glass_korr_l
     addColumn("id_param",QString::fromUtf8("Параметр"),NULL,Rels::instance()->relPar);
     addColumn("val",QString::fromUtf8("Значение"),new QDoubleValidator(0,1000000,3,this));
     addColumn("temp",QString::fromUtf8("Т изм.,°С"),new QDoubleValidator(-100,100,1,this));
+    addColumn("dat",QString::fromUtf8("Дата изм."));
     setSort("glass_korr_load_par.id_param");
     setDefaultValue(3,23.0);
 }
@@ -363,7 +364,7 @@ QVariant ModelConsStatData::data(const QModelIndex &item, int role) const
 void ModelConsStatData::refreshInPar()
 {
     QSqlQuery qu;
-    qu.prepare("select l.id_load, p.nam, l.val, l.temp "
+    qu.prepare("select l.id_load, p.nam, l.val, l.temp, l.dat "
                "from glass_korr_load_par as l "
                "inner join glass_par as p on p.id=l.id_param "
                "where l.id_load = (select id_korr_load from glass_cons_load where id= :id_load)");
@@ -375,6 +376,7 @@ void ModelConsStatData::refreshInPar()
             if (!qu.value(3).isNull()){
                 val+=QString::fromUtf8(" (")+qu.value(3).toString()+QString::fromUtf8("°С)");
             }
+            val+=" "+qu.value(4).toDate().toString("dd.MM.yy");
             inPar.insert(qu.value(0).toInt(),val);
         }
     } else {

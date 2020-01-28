@@ -50,6 +50,7 @@ FormKorr::FormKorr(QWidget *parent) :
     ui->tableViewStatPar->setColumnWidth(1,120);
     ui->tableViewStatPar->setColumnWidth(2,70);
     ui->tableViewStatPar->setColumnWidth(3,70);
+    ui->tableViewStatPar->setColumnWidth(4,80);
 
     modelKorrStat = new ModelKorrStat(this);
     ui->tableViewStat->setModel(modelKorrStat);
