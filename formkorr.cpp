@@ -21,7 +21,7 @@ FormKorr::FormKorr(QWidget *parent) :
     modelKorrLoadData = new ModelKorrLoadData(this);
     ui->tableViewLoadGlass->setModel(modelKorrLoadData);
     ui->tableViewLoadGlass->setColumnHidden(0,true);
-    ui->tableViewLoadGlass->setColumnWidth(1,350);
+    ui->tableViewLoadGlass->setColumnWidth(1,380);
     ui->tableViewLoadGlass->setColumnWidth(2,70);
 
     modelKorrLoad = new ModelKorrLoad(this);

@@ -16,7 +16,7 @@ FormCons::FormCons(QWidget *parent) :
     modelConsLoadPar = new ModelConsLoadPar(this);
     ui->tableViewStatPar->setModel(modelConsLoadPar);
     ui->tableViewStatPar->setColumnHidden(0,true);
-    ui->tableViewStatPar->setColumnWidth(1,120);
+    ui->tableViewStatPar->setColumnWidth(1,130);
     ui->tableViewStatPar->setColumnWidth(2,70);
     ui->tableViewStatPar->setColumnWidth(3,70);
     ui->tableViewStatPar->setColumnWidth(4,80);
@@ -26,7 +26,7 @@ FormCons::FormCons(QWidget *parent) :
     ui->tableViewStatGlass->setModel(modelConsStatData);
     ui->tableViewStatGlass->setColumnHidden(0,true);
     ui->tableViewStatGlass->setColumnWidth(1,50);
-    ui->tableViewStatGlass->setColumnWidth(2,80);
+    ui->tableViewStatGlass->setColumnWidth(2,90);
     ui->tableViewStatGlass->setColumnWidth(3,60);
     ui->tableViewStatGlass->setColumnWidth(4,80);
     ui->tableViewStatGlass->setColumnWidth(5,60);
@@ -39,21 +39,21 @@ FormCons::FormCons(QWidget *parent) :
     connect(ui->tableViewStat->selectionModel(),SIGNAL(currentRowChanged(QModelIndex,QModelIndex)),this,SLOT(updStatData(QModelIndex)));
     updStat();
     ui->tableViewStat->setColumnHidden(0,true);
-    ui->tableViewStat->setColumnWidth(1,50);
-    ui->tableViewStat->setColumnWidth(2,80);
-    ui->tableViewStat->setColumnWidth(3,80);
+    ui->tableViewStat->setColumnWidth(1,40);
+    ui->tableViewStat->setColumnWidth(2,75);
+    ui->tableViewStat->setColumnWidth(3,90);
     ui->tableViewStat->setColumnWidth(4,60);
     ui->tableViewStat->setColumnWidth(5,60);
-    ui->tableViewStat->setColumnWidth(6,70);
+    ui->tableViewStat->setColumnWidth(6,75);
 
     modelConsLoad = new ModelConsLoad(this);
     ui->tableViewLoad->setModel(modelConsLoad);
     ui->tableViewLoad->setColumnHidden(0,true);
     ui->tableViewLoad->setColumnWidth(1,80);
     ui->tableViewLoad->setColumnWidth(2,50);
-    ui->tableViewLoad->setColumnWidth(3,330);
+    ui->tableViewLoad->setColumnWidth(3,355);
     ui->tableViewLoad->setColumnWidth(4,70);
-    ui->tableViewLoad->setColumnWidth(5,330);
+    ui->tableViewLoad->setColumnWidth(5,355);
 
     connect(ui->pushButtonUpd,SIGNAL(clicked(bool)),this,SLOT(updLoad()));
     connect(ui->pushButtonUpdCurrentTime,SIGNAL(clicked(bool)),this,SLOT(updStatCurrentTime()));
